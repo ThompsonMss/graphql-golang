@@ -1,11 +1,12 @@
 package main
 
 import (
-	"grapql-golang/graph"
-	"grapql-golang/graph/generated"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/thompsonmss/grapql-golang/graph"
+	"github.com/thompsonmss/grapql-golang/graph/generated"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"

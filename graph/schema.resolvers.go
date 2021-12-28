@@ -6,39 +6,114 @@ package graph
 import (
 	"context"
 	"fmt"
-	"grapql-golang/graph/generated"
-	"grapql-golang/graph/model"
+	"math/rand"
+
+	generated1 "github.com/thompsonmss/grapql-golang/graph/generated"
+	"github.com/thompsonmss/grapql-golang/graph/model"
 )
 
+func (r *categoryResolver) Courses(ctx context.Context, obj *model.Category) ([]*model.Course, error) {
+	var courses []*model.Course
+
+	for _, v := range r.Resolver.Courses {
+		if v.Category.ID == obj.ID {
+			courses = append(courses, v)
+		}
+	}
+
+	return courses, nil
+}
+
+func (r *courseResolver) Chapters(ctx context.Context, obj *model.Course) ([]*model.Chapter, error) {
+	var chapters []*model.Chapter
+
+	for _, v := range r.Resolver.Chapters {
+		if v.Course.ID == obj.ID {
+			chapters = append(chapters, v)
+		}
+	}
+
+	return chapters, nil
+}
+
 func (r *mutationResolver) CreateCategory(ctx context.Context, input model.NewCategory) (*model.Category, error) {
-	panic(fmt.Errorf("not implemented"))
+	category := model.Category{
+		ID:          fmt.Sprintf("T%d", rand.Int()),
+		Name:        input.Name,
+		Description: &input.Description,
+	}
+
+	r.Categories = append(r.Categories, &category)
+
+	return &category, nil
 }
 
 func (r *mutationResolver) CreateCourse(ctx context.Context, input model.NewCourse) (*model.Course, error) {
-	panic(fmt.Errorf("not implemented"))
+	var category *model.Category
+
+	for _, v := range r.Categories {
+		if v.ID == input.CategoryID {
+			category = v
+		}
+	}
+
+	course := model.Course{
+		ID:          fmt.Sprintf("T%d", rand.Int()),
+		Name:        input.Name,
+		Description: &input.Description,
+		Category:    category,
+	}
+
+	r.Courses = append(r.Courses, &course)
+
+	return &course, nil
 }
 
 func (r *mutationResolver) CreateChapter(ctx context.Context, input model.NewChapter) (*model.Chapter, error) {
-	panic(fmt.Errorf("not implemented"))
+	var course *model.Course
+
+	for _, v := range r.Courses {
+		if v.ID == input.CourseID {
+			course = v
+		}
+	}
+
+	chapter := model.Chapter{
+		ID:     fmt.Sprintf("T%d", rand.Int()),
+		Name:   input.Name,
+		Course: course,
+	}
+
+	r.Chapters = append(r.Chapters, &chapter)
+
+	return &chapter, nil
 }
 
 func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, error) {
-	panic(fmt.Errorf("not implemented"))
+	return r.Resolver.Categories, nil
 }
 
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
-	panic(fmt.Errorf("not implemented"))
+	return r.Resolver.Courses, nil
 }
 
 func (r *queryResolver) Chapters(ctx context.Context) ([]*model.Chapter, error) {
-	panic(fmt.Errorf("not implemented"))
+	return r.Resolver.Chapters, nil
 }
 
-// Mutation returns generated.MutationResolver implementation.
-func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
+// Category returns generated1.CategoryResolver implementation.
+func (r *Resolver) Category() generated1.CategoryResolver { return &categoryResolver{r} }
 
-// Query returns generated.QueryResolver implementation.
-func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+// Course returns generated1.CourseResolver implementation.
+func (r *Resolver) Course() generated1.CourseResolver { return &courseResolver{r} }
 
+// Mutation returns generated1.MutationResolver implementation.
+func (r *Resolver) Mutation() generated1.MutationResolver { return &mutationResolver{r} }
+
+// Query returns generated1.QueryResolver implementation.
+func (r *Resolver) Query() generated1.QueryResolver { return &queryResolver{r} }
+
+type categoryResolver struct{ *Resolver }
+type courseResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

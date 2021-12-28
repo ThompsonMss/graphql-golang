@@ -1,4 +1,4 @@
-module grapql-golang
+module github.com/thompsonmss/grapql-golang
 
 go 1.16
 
