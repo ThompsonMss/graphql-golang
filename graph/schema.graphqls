@@ -17,7 +17,7 @@ type Chapter {
   id: ID!
   name: String!
   course: Course!
-  categry: Category!
+  category: Category!
 }
 
 input NewCategory {
@@ -32,7 +32,7 @@ input NewCourse {
 }
 
 input NewChapter {
-  name: string!
+  name: String!
   courseId: ID!
 }
 
